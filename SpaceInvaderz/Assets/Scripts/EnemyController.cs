@@ -7,6 +7,7 @@ public class EnemyController : MonoBehaviour {
     [Header("Enemy Properties")]
     [SerializeField] private int health = 3;
     [SerializeField] private float speed = 5;
+    [SerializeField] private int pointValue;
     [SerializeField] private GameObject target;
 
     private void Start() {
@@ -37,6 +38,7 @@ public class EnemyController : MonoBehaviour {
         if (health>1) {
             health--;
         } else {
+            GameManager.Instance.GainPoints(pointValue);
             Destroy(this.gameObject);
         }
     }

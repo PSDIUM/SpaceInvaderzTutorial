@@ -20,7 +20,7 @@ public class Spawner : MonoBehaviour {
         if (spawnList.Count>0) {
             Spawn();
         } else {
-            Debug.Log("All enemies have spawned");
+            GameManager.Instance.EndGame("PROTECTED!");
         }
     }
 
@@ -39,7 +39,7 @@ public class Spawner : MonoBehaviour {
     }
     private void Spawn() {
         if (!onCooldown) {
-            int index = Random.Range(0, allEnemies.Length);
+            int index = Random.Range(0, spawnList.Count);
             SpawnEnemy(spawnList[index]);
             StartCoroutine(Cooldown(2));
         }

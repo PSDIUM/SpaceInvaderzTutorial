@@ -98,5 +98,5 @@ MonoBehaviour:
   accelerationBase: 1
   projectile: {fileID: 377805922445250937, guid: 978e0e2a3eefdb1438a3019aa34bc1e6,
     type: 3}
-  shootingSpeed: 0
-  shotsPerSecond: 0.3
+  shootingSpeed: 20
+  shotsPerSecond: 0.1
