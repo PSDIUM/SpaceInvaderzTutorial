@@ -13,14 +13,17 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Projectile Details")]
     [SerializeField] private Projectile projectile;
+    [SerializeField] private float shootingSpeed;
+    [SerializeField] private float shotsPerSecond = 0.3f;
 
     private Vector2 playerBounds;
     private bool onShootCooldown;
 
     private void Awake() {
-        GameManager.Instance.Player = this.gameObject;
+       
     }
     private void Start() {
+        GameManager.Instance.Player = this.gameObject;
         playerBounds = GameManager.Instance.Bounds;
     }
 
@@ -56,8 +59,8 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetMouseButton(0) && !onShootCooldown) {
             Projectile projectileObject = Instantiate(projectile, transform.position, Quaternion.identity);
-            projectileObject.Initialise(transform);
-            StartCoroutine(Cooldown(0.5f));
+            projectileObject.Initialise(transform, shootingSpeed);
+            StartCoroutine(Cooldown(shotsPerSecond));
         }
     }
 

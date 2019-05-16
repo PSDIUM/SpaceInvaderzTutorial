@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour {
     }
 
     private void SetTarget() {
-        target = GameManager.Instance.Player;
+        target = GameManager.Instance.PlayerBase;
     }
 
     private void Update() {
@@ -29,6 +29,7 @@ public class EnemyController : MonoBehaviour {
     private void OnTriggerEnter2D(Collider2D col) {
         if (col.gameObject.tag.Equals("Projectile")) {
             Damage();
+            Destroy(col.gameObject);
         }
     }
 
