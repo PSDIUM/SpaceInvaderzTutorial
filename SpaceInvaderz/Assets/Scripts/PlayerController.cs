@@ -11,8 +11,22 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float accelerationBase= 1;
     private float acceleration = 1;
 
-	private void Update() {
+    [Header("Projectile Details")]
+    [SerializeField] private Projectile projectile;
+
+    private Vector2 playerBounds;
+    private bool onShootCooldown;
+
+    private void Awake() {
+        GameManager.Instance.Player = this.gameObject;
+    }
+    private void Start() {
+        playerBounds = GameManager.Instance.Bounds;
+    }
+
+    private void Update() {
 		Movement();
+        Shoot();
 	}
 
 	private void Movement() {
@@ -22,7 +36,12 @@ public class PlayerController : MonoBehaviour {
 
 		velocity *= speed * acceleration * Time.deltaTime;
 
-		transform.position += new Vector3(velocity.x, velocity.y, 0);
+        Vector3 nextPosition = new Vector3(velocity.x, velocity.y, 0) + transform.position;
+
+        nextPosition.x = Mathf.Clamp(nextPosition.x, -playerBounds.x, playerBounds.x);
+        nextPosition.y = Mathf.Clamp(nextPosition.y, -playerBounds.y, playerBounds.y);
+
+        transform.position = nextPosition;
 
 		if (inputX!=0 || inputY!=0) {
 			acceleration += accelerationStepping;
@@ -32,4 +51,25 @@ public class PlayerController : MonoBehaviour {
 			acceleration = accelerationBase;
 		}
 	}
+
+    private void Shoot() {
+
+        if (Input.GetMouseButton(0) && !onShootCooldown) {
+            Projectile projectileObject = Instantiate(projectile, transform.position, Quaternion.identity);
+            projectileObject.Initialise(transform);
+            StartCoroutine(Cooldown(0.5f));
+        }
+    }
+
+    private IEnumerator Cooldown(float time) {
+        float elapsedTime = 0;
+        onShootCooldown = true;
+
+        while (elapsedTime<time) {
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        onShootCooldown = false;
+    }
 }

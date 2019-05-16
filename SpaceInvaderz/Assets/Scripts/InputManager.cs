@@ -4,17 +4,23 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour {
 
+    private static InputManager _instance;
+    public static InputManager Instance { get { return _instance; } }
 
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    private void Awake() {
+        SetSingleton();
+    }
+    private void SetSingleton() {
+        if (_instance != null && _instance != this) {
+            Destroy(this.gameObject);
+        }
+        else {
+            _instance = this;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public Vector3 GetMouseWorldPosition() {
+        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
+
 }
