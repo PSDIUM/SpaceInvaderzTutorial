@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+	[Header("Player Properties")]
+	[SerializeField] private int maxHealth = 3;
+	private int currentHealth;
+
 	[Header("Physics Properties")]
 	[SerializeField] private float speed = 5;
     [SerializeField] private float maxAcceleration = 5;
@@ -25,10 +29,12 @@ public class PlayerController : MonoBehaviour {
     private void Start() {
         GameManager.Instance.Player = this.gameObject;
         playerBounds = GameManager.Instance.Bounds;
+		currentHealth = maxHealth;
     }
 
     private void Update() {
 		Movement();
+		Rotation();
         Shoot();
 	}
 
@@ -55,16 +61,21 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-    private void Shoot() {
+	private void Rotation() {
+		Vector3 target = InputManager.Instance.GetMouseWorldPosition();
+		transform.rotation = Global.LookTowards(target, transform.position);
+	}
 
+	private void Shoot() {
         if (Input.GetMouseButton(0) && !onShootCooldown) {
-            Projectile projectileObject = Instantiate(projectile, transform.position, Quaternion.identity);
-            projectileObject.Initialise(transform, shootingSpeed);
+            Projectile projectileObject = Instantiate(projectile, transform.position, transform.rotation);
+			Vector2 dir = InputManager.Instance.GetMouseWorldPosition() - transform.position;
+			projectileObject.Initialise(dir.normalized, shootingSpeed);
             StartCoroutine(Cooldown(shotsPerSecond));
         }
     }
 
-    private IEnumerator Cooldown(float time) {
+	private IEnumerator Cooldown(float time) {
         float elapsedTime = 0;
         onShootCooldown = true;
 
@@ -75,4 +86,20 @@ public class PlayerController : MonoBehaviour {
 
         onShootCooldown = false;
     }
+
+	private void OnTriggerExit2D(Collider2D col) {
+		if (col.gameObject.tag.Equals("EnemyProjectile")) {
+			Damage();
+			Destroy(col.gameObject);
+		}
+	}
+
+	private void Damage() {
+		currentHealth--;
+		float percentage = (float)currentHealth / (float)maxHealth;
+		UIManager.Instance.UpdateHealth(percentage);
+		if (currentHealth <= 0) {
+			GameManager.Instance.EndGame("DEFEATED!");
+		}
+	}
 }

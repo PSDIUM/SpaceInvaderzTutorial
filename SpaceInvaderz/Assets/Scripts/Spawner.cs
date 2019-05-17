@@ -19,23 +19,24 @@ public class Spawner : MonoBehaviour {
     private void Update() {
         if (spawnList.Count>0) {
             Spawn();
-        } else {
-            GameManager.Instance.EndGame("PROTECTED!");
-        }
+        } 
     }
 
     private void InitialiseSpawner() {
         spawnList = new List<int>();
         spawnPoints = new Vector3[SpawnPointsContainer.childCount];
+		int totalEnemies = 0;
 
         for (int x=0; x<allEnemies.Length; x++) {
             spawnList.Add(x);
+			totalEnemies += allEnemies[x].amount;
         }
 
         for (int x=0; x<SpawnPointsContainer.childCount; x++) {
             spawnPoints[x] = SpawnPointsContainer.GetChild(x).position;
         }
 
+		GameManager.Instance.TotalEnemies = totalEnemies;
     }
     private void Spawn() {
         if (!onCooldown) {

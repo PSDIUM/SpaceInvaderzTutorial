@@ -8,22 +8,14 @@ public class Projectile : MonoBehaviour {
     [SerializeField] private float speed = 5;
     [SerializeField] private float lifeTime = 1f;
 
-    [Header("Sprite Options")]
-    [SerializeField] private Sprite[] projectileSprites;
-    private SpriteRenderer spriteRenderer;
-
     private Vector2 dir;
 
     private void Start() {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        int spriteIndex = Random.Range(0, projectileSprites.Length);
-        spriteRenderer.sprite = projectileSprites[spriteIndex];
         StartCoroutine(DeathTimer());
     }
 
-    public void Initialise(Transform player, float speed) {
-        dir = InputManager.Instance.GetMouseWorldPosition() - player.position;
-        dir.Normalize();
+    public void Initialise(Vector2 dir, float speed) {
+		this.dir = dir;
         this.speed = speed;
     }
 

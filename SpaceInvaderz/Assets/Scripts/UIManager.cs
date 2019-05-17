@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class UIManager : MonoBehaviour {
@@ -11,15 +12,12 @@ public class UIManager : MonoBehaviour {
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI score;
     [SerializeField] private TextMeshProUGUI outcome;
+	[SerializeField] private Image healthBar; 
 
     private void Awake() {
         SetSingleton();
     }
 
-    private void Start() {
-        outcome.enabled = false;
-        
-    }
     private void SetSingleton() {
         if (_instance != null && _instance != this) {
             Destroy(this.gameObject);
@@ -29,7 +27,11 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    public void UpdateScore(int amount) {
+	public void UpdateHealth(float percentage) {
+		healthBar.transform.localScale = new Vector3(percentage, 1, 1);
+	}
+
+	public void UpdateScore(int amount) {
         score.text = "Score: " + amount;
     }
 
