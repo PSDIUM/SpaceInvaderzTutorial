@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : ShipController {
 
-	[Header("Player Properties")]
-	[SerializeField] private int maxHealth = 3;
-	private int currentHealth;
+	private Vector2 playerBounds;
 
 	[Header("Physics Properties")]
 	[SerializeField] private float speed = 5;
@@ -15,24 +13,13 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float accelerationBase= 1;
     private float acceleration = 1;
 
-    [Header("Projectile Details")]
-    [SerializeField] private Projectile projectile;
-    [SerializeField] private float shootingSpeed;
-    [SerializeField] private float shotsPerSecond = 0.3f;
-
-    private Vector2 playerBounds;
-    private bool onShootCooldown;
-
-    private void Awake() {
-       
-    }
-    private void Start() {
+	protected override void OnStart() {
         GameManager.Instance.Player = this.gameObject;
         playerBounds = GameManager.Instance.Bounds;
 		currentHealth = maxHealth;
     }
 
-    private void Update() {
+	protected override void OnUpdate() {
 		Movement();
 		Rotation();
         Shoot();
@@ -61,30 +48,18 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	private void Rotation() {
-		Vector3 target = InputManager.Instance.GetMouseWorldPosition();
-		transform.rotation = Global.LookTowards(target, transform.position);
+	protected override void Rotation() {
+		targetPos = InputManager.Instance.GetMouseWorldPosition();
+		base.Rotation();
 	}
 
-	private void Shoot() {
+	protected override void Shoot() {
         if (Input.GetMouseButton(0) && !onShootCooldown) {
             Projectile projectileObject = Instantiate(projectile, transform.position, transform.rotation);
 			Vector2 dir = InputManager.Instance.GetMouseWorldPosition() - transform.position;
 			projectileObject.Initialise(dir.normalized, shootingSpeed);
             StartCoroutine(Cooldown(shotsPerSecond));
         }
-    }
-
-	private IEnumerator Cooldown(float time) {
-        float elapsedTime = 0;
-        onShootCooldown = true;
-
-        while (elapsedTime<time) {
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        onShootCooldown = false;
     }
 
 	private void OnTriggerExit2D(Collider2D col) {

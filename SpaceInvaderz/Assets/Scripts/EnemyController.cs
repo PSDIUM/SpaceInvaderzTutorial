@@ -2,21 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour {
+public class EnemyController : ShipController {
 
     [Header("Enemy Properties")]
-    [SerializeField] private int health = 3;
     [SerializeField] private float speed = 5;
     [SerializeField] private int pointValue;
-	[SerializeField] private float projectileSpeed = 20;
-	[SerializeField] private float shotsPerSecond = 0.3f;
 
 	[Header("Enemy Elements")]
     [SerializeField] private GameObject target;
-	[SerializeField] private Projectile projectile;
-	private bool onShootCooldown;
 
-	private void Start() {
+	protected override void OnStart() {
+		currentHealth = maxHealth;
         SetTarget();
     }
 
@@ -24,7 +20,7 @@ public class EnemyController : MonoBehaviour {
         target = GameManager.Instance.Player;
     }
 
-    private void Update() {
+    protected override void OnUpdate() {
         FollowTarget();
 		Rotation();
 		Shoot();
@@ -35,8 +31,9 @@ public class EnemyController : MonoBehaviour {
         transform.position = Vector3.MoveTowards(transform.position, target.transform.position, step);
     }
 
-	private void Rotation() {
-		transform.rotation = Global.LookTowards(target.transform.position, transform.position);
+	protected override void Rotation() {
+		targetPos = target.transform.position;
+		base.Rotation();
 	}
 
 	private void OnTriggerEnter2D(Collider2D col) {
@@ -46,31 +43,18 @@ public class EnemyController : MonoBehaviour {
         }
     }
 
-	private void Shoot() {
+	protected override void Shoot() {
 		if (!onShootCooldown) {
 			Projectile projectileObject = Instantiate(projectile, transform.position, transform.rotation);
 			Vector2 dir = target.transform.position - transform.position;
-			projectileObject.Initialise(dir.normalized, projectileSpeed);
+			projectileObject.Initialise(dir.normalized, shootingSpeed);
 			StartCoroutine(Cooldown(shotsPerSecond));
 		}
 	}
 
-	private IEnumerator Cooldown(float time) {
-		float elapsedTime = 0;
-		onShootCooldown = true;
-
-		while (elapsedTime < time) {
-			elapsedTime += Time.deltaTime;
-			yield return null;
-		}
-
-		onShootCooldown = false;
-	}
-
-
 	private void Damage() {
-        if (health>1) {
-            health--;
+        if (currentHealth>1) {
+            currentHealth--;
         } else {
 			GameManager.Instance.DestroyEnemy(pointValue);
             Destroy(this.gameObject);
